@@ -26,9 +26,7 @@ def get_weather() -> None:
               f"Weather: {temperature} Celsius, {condition}")
 
     else:
-        error = data["error"]["message"]
-
-        print(f"Status code: {response.status_code}. Error: {error}")
+        print("Error:", response.status_code)
 
 
 if __name__ == "__main__":
