@@ -11,11 +11,15 @@ PARAMS = {
 
 
 def get_weather() -> None:
+    if not API_KEY:
+        print("❌ API_KEY is missing. Please set it as an environment variable.")
+        return
 
-    response = requests.get(URL, params=PARAMS)
-    data = response.json()
+    try:
+        response = requests.get(URL, params=PARAMS, timeout=5)
+        response.raise_for_status()  # кинe HTTPError, якщо статус не 2xx
+        data = response.json()
 
-    if response.status_code == 200:
         city = data["location"]["name"]
         country = data["location"]["country"]
         time = data["location"]["localtime"]
@@ -23,11 +27,18 @@ def get_weather() -> None:
         condition = data["current"]["condition"]["text"]
 
         print(f"{city}/{country} {time} "
-              f"Weather: {temperature} Celsius, {condition}")
+              f"Weather: {temperature}°C, {condition}")
 
-    else:
-        print("Error:", response.status_code)
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_data = response.json()
+            message = error_data.get("error", {}).get("message", str(http_err))
+        except Exception:
+            message = str(http_err)
+        print(f"❌ HTTP error: {message}")
 
+    except requests.exceptions.RequestException as req_err:
+        print(f"❌ Network error: {req_err}")
 
-if __name__ == "__main__":
-    get_weather()
+    except KeyError as key_err:
+        print(f"❌ Missing expected data: {key_err}")
