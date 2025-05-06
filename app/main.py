@@ -12,12 +12,13 @@ PARAMS = {
 
 def get_weather() -> None:
     if not API_KEY:
-        print("❌ API_KEY is missing. Please set it as an environment variable.")
+        print("❌ API_KEY is missing. "
+              "Please set it as an environment variable.")
         return
 
     try:
         response = requests.get(URL, params=PARAMS, timeout=5)
-        response.raise_for_status()  # кинe HTTPError, якщо статус не 2xx
+        response.raise_for_status()
         data = response.json()
 
         city = data["location"]["name"]
